@@ -6,6 +6,7 @@ from google.genai import types
 from telegram import Bot
 from dotenv import load_dotenv
 from streamlit_webrtc import webrtc_streamer, VideoTransformerBase
+import av
 
 # Load environment variables from .env file
 load_dotenv()
@@ -35,11 +36,43 @@ uploaded_file = st.file_uploader("Escolha uma imagem ou vídeo...", type=["jpg",
 text_input = st.text_area("Digite o texto aqui...")
 
 class VideoProcessor(VideoTransformerBase):
+    def __init__(self):
+        self.client = client
+
     def transform(self, frame):
-        # Process the video frame here
         img = frame.to_ndarray(format="bgr24")
-        # Add your processing code here
-        return img
+        # Convert the frame to a format suitable for the API
+        img_bytes = av.VideoFrame.from_ndarray(img, format="bgr24").to_image().tobytes()
+        # Upload the frame to the API
+        uploaded_file = self.client.files.upload(file=img_bytes, mime_type="image/jpeg")
+        contents = [
+            types.Content(
+                role="user",
+                parts=[
+                    types.Part.from_uri(
+                        file_uri=uploaded_file.uri,
+                        mime_type=uploaded_file.mime_type,
+                    ),
+                    types.Part.from_text(text="Describe this image in Portuguese."),
+                ],
+            ),
+        ]
+        generate_content_config = types.GenerateContentConfig(
+            temperature=1,
+            top_p=0.95,
+            top_k=40,
+            max_output_tokens=8192,
+            response_mime_type="text/plain",
+        )
+        response_text = ""
+        for chunk in self.client.models.generate_content_stream(
+            model="gemini-2.0-flash",
+            contents=contents,
+            config=generate_content_config,
+        ):
+            if chunk and chunk.text:
+                response_text += chunk.text
+        return response_text
 
 st.write("Ou use a câmera para enviar um vídeo em tempo real:")
 webrtc_ctx = webrtc_streamer(key="example", video_processor_factory=VideoProcessor)
