@@ -5,6 +5,7 @@ from google import genai
 from google.genai import types
 from telegram import Bot
 from dotenv import load_dotenv
+from streamlit_webrtc import webrtc_streamer, VideoTransformerBase
 
 # Load environment variables from .env file
 load_dotenv()
@@ -27,11 +28,21 @@ logger.info("Initializing Gemma client")
 client = genai.Client(api_key=api_key)
 logger.info("Gemma client initialized successfully")
 
-st.title("Telegram Bot Interface")
-st.write("Envie-me uma foto, vídeo ou um texto para processar!")
+st.title("📸 Telegram Bot Interface")
+st.write("Envie-me uma foto, vídeo ou um texto para processar! 😊")
 
 uploaded_file = st.file_uploader("Escolha uma imagem ou vídeo...", type=["jpg", "jpeg", "png", "mp4", "mov"])
 text_input = st.text_area("Digite o texto aqui...")
+
+class VideoProcessor(VideoTransformerBase):
+    def transform(self, frame):
+        # Process the video frame here
+        img = frame.to_ndarray(format="bgr24")
+        # Add your processing code here
+        return img
+
+st.write("Ou use a câmera para enviar um vídeo em tempo real:")
+webrtc_ctx = webrtc_streamer(key="example", video_processor_factory=VideoProcessor)
 
 if st.button("Processar"):
     if uploaded_file and text_input:
