@@ -1,12 +1,12 @@
-# 🤖 Bot do Telegram com Integração Gemma
+# 🤖 Bot do Telegram com Integração Gemini
 
-Este projeto é um bot do Telegram que processa imagens e textos usando a API Gemma. O bot pode lidar com mensagens contendo fotos com legendas ou mensagens de texto simples.
+Este projeto é um bot do Telegram que processa imagens e textos usando a API Gemini. O bot pode lidar com mensagens contendo fotos com legendas ou mensagens de texto simples.
 
 ## 🌟 Funcionalidades
 
 - Responde ao comando `/start` com uma mensagem de boas-vindas.
-- Processa fotos com legendas fazendo upload da foto para o Gemma e gerando uma resposta baseada na imagem e no texto.
-- Processa mensagens de texto simples enviando o texto para o Gemma e gerando uma resposta.
+- Processa fotos com legendas fazendo upload da foto para o Gemini e gerando uma resposta baseada na imagem e no texto.
+- Processa mensagens de texto simples enviando o texto para o Gemini e gerando uma resposta.
 - Responde ao comando `/stop` para parar o bot.
 
 ## 🛠️ Configuração
