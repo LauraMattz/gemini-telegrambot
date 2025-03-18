@@ -75,10 +75,23 @@ class VideoProcessor(VideoTransformerBase):
         return response_text
 
 st.write("Ou use a câmera para enviar um vídeo em tempo real:")
-webrtc_ctx = webrtc_streamer(key="example", video_processor_factory=VideoProcessor)
+
+# Improved UI for live video
+webrtc_ctx = webrtc_streamer(
+    key="example",
+    video_processor_factory=VideoProcessor,
+    rtc_configuration={"iceServers": [{"urls": ["stun:stun.l.google.com:19302"]}]},
+    media_stream_constraints={"video": True, "audio": False},
+    async_processing=True,
+)
+
+if webrtc_ctx.video_processor:
+    st.write("📹 Processando vídeo ao vivo...")
+    description = webrtc_ctx.video_processor.transform(webrtc_ctx.video_frame)
+    st.write("Descrição: ", description)
 
 if st.button("Processar"):
-    if uploaded_file and text_input:
+    if uploaded_file:
         try:
             # Save the uploaded file
             file_path = os.path.join("temp", uploaded_file.name)
@@ -136,4 +149,4 @@ if st.button("Processar"):
             logger.error(f"Error processing file and text: {e}")
             st.error("Desculpe, ocorreu um erro ao processar o arquivo e o texto. 😞")
     else:
-        st.warning("Por favor, envie um arquivo e um texto.")
+        st.warning("Por favor, envie um arquivo.")
